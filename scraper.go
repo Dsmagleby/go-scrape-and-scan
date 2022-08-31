@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	apiCalls "go-scrape-and-scan/utils/apiCalls"
+	helper "go-scrape-and-scan/utils/helper"
 	"os"
 
 	"github.com/VirusTotal/vt-go"
@@ -32,7 +33,7 @@ func main() {
 
 	c.OnHTML("a[href]", func(h *colly.HTMLElement) {
 		link := h.Attr("href")
-		links = append(links, link)
+		links = append(links, h.Request.AbsoluteURL(link))
 	})
 
 	// Before making a request print "Visiting ..."
@@ -42,6 +43,9 @@ func main() {
 
 	// Start scraping
 	c.Visit(*url)
+	links = helper.Filter(links, *url)
+	fmt.Println("Links found:", len(links))
+	fmt.Println("Links:", links)
 
 	// check if links are found
 	if len(links) <= 0 {
@@ -60,7 +64,7 @@ func main() {
 		"used,", remaining, "remaining")
 
 	// check that api is capable of scanning the url list
-	if remaining <= 0 {
+	if remaining == 0 {
 		fmt.Println("Daily quota exceeded")
 		os.Exit(0)
 	} else if remaining < len(links) {
