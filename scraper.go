@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"go-scrape-and-scan/utils"
 	"log"
 	"net/http"
 	"os"
-	"utils/responseStruct"
 
 	"github.com/VirusTotal/vt-go"
 	"github.com/gocolly/colly"
@@ -69,7 +69,7 @@ func main() {
 	//	log.Fatal(err)
 	//}
 
-	var quota responseStruct.Quota
+	var quota utils.Quota
 	if err := json.NewDecoder(resp.Body).Decode(&quota); err != nil {
 		log.Fatal(err)
 	}

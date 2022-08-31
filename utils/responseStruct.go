@@ -1,4 +1,4 @@
-package responseStruct
+package utils
 
 type Quota struct {
 	Data struct {
