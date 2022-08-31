@@ -1,4 +1,4 @@
-package utils
+package dataStruct
 
 type Quota struct {
 	Data struct {

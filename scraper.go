@@ -1,12 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"go-scrape-and-scan/utils"
-	"log"
-	"net/http"
+	apiCalls "go-scrape-and-scan/utils/apiCalls"
 	"os"
 
 	"github.com/VirusTotal/vt-go"
@@ -46,38 +43,34 @@ func main() {
 	// Start scraping
 	c.Visit(*url)
 
+	// check if links are found
+	if len(links) <= 0 {
+		fmt.Println("No links found")
+		os.Exit(0)
+	}
+
 	vt_client := vt.NewClient(*apikey)
 	scanner := vt_client.NewURLScanner()
+	fmt.Println(scanner)
 
 	// check daily quota
-	client := http.Client{}
-	quotaEndpoint := "https://www.virustotal.com/api/v3/users/" + *apikey + "/overall_quotas"
-	req, err := http.NewRequest("GET", quotaEndpoint, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Apikey", *apikey)
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
+	allowed, used := apiCalls.GetDailyQuota(*apikey)
+	remaining := allowed - used
+	fmt.Println("Daily quota for apikey:", allowed, "allowed,", used,
+		"used,", remaining, "remaining")
 
-	//body, err := ioutil.ReadAll(resp.Body)
+	// check that api is capable of scanning the url list
+	if remaining <= 0 {
+		fmt.Println("Daily quota exceeded")
+		os.Exit(0)
+	} else if remaining < len(links) {
+		fmt.Println("Not enough quota to scan all links")
+		os.Exit(0)
+	}
+
+	//report, err := scanner.Scan("https://github.com/VirusTotal/vt-go/issues/24")
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
-
-	var quota utils.Quota
-	if err := json.NewDecoder(resp.Body).Decode(&quota); err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(quota.Data.APIRequestsDaily.User.Used)
-
-	report, err := scanner.Scan("https://github.com/VirusTotal/vt-go/issues/24")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(report)
+	//fmt.Println(report)
 }
