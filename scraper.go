@@ -7,7 +7,6 @@ import (
 	helper "go-scrape-and-scan/utils/helper"
 	"os"
 
-	"github.com/VirusTotal/vt-go"
 	"github.com/gocolly/colly"
 )
 
@@ -44,18 +43,18 @@ func main() {
 	// Start scraping
 	c.Visit(*url)
 	links = helper.Filter(links, *url)
-	fmt.Println("Links found:", len(links))
-	fmt.Println("Links:", links)
 
 	// check if links are found
+	// then print amount to cmd
 	if len(links) <= 0 {
 		fmt.Println("No links found")
 		os.Exit(0)
 	}
+	fmt.Println("Links found:", len(links))
 
-	vt_client := vt.NewClient(*apikey)
-	scanner := vt_client.NewURLScanner()
-	fmt.Println(scanner)
+	//vt_client := vt.NewClient(*apikey)
+	//scanner := vt_client.NewURLScanner()
+	//fmt.Println(scanner) // temp print
 
 	// check daily quota
 	allowed, used := apiCalls.GetDailyQuota(*apikey)
@@ -68,10 +67,11 @@ func main() {
 		fmt.Println("Daily quota exceeded")
 		os.Exit(0)
 	} else if remaining < len(links) {
-		fmt.Println("Not enough quota to scan all links")
+		fmt.Println("Links found exceeds daily quota")
 		os.Exit(0)
 	}
 
+	// u-0908bb191bccd4d75bc210482c32633530d0e7dd3a3af3c8f1947b1a43eac817-1662056602
 	//report, err := scanner.Scan("https://github.com/VirusTotal/vt-go/issues/24")
 	//if err != nil {
 	//	log.Fatal(err)
