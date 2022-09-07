@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"flag"
 	"fmt"
 	apiCalls "go-scrape-and-scan/utils/apiCalls"
@@ -59,7 +58,6 @@ func main() {
 	fmt.Println("Daily quota for apikey:", allowed, "allowed,", used,
 		"used,", remaining, "remaining")
 
-	fmt.Println(base64.RawURLEncoding.EncodeToString([]byte("https://github.com/VirusTotal/vt-go/issues/24")))
 	// check that api is capable of scanning the url list
 	if remaining == 0 {
 		fmt.Println("Daily quota exceeded")
