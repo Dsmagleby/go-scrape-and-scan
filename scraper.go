@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"flag"
 	"fmt"
 	apiCalls "go-scrape-and-scan/utils/apiCalls"
@@ -52,29 +53,37 @@ func main() {
 	}
 	fmt.Println("Links found:", len(links))
 
-	//vt_client := vt.NewClient(*apikey)
-	//scanner := vt_client.NewURLScanner()
-	//fmt.Println(scanner) // temp print
-
 	// check daily quota
 	allowed, used := apiCalls.GetDailyQuota(*apikey)
 	remaining := allowed - used
 	fmt.Println("Daily quota for apikey:", allowed, "allowed,", used,
 		"used,", remaining, "remaining")
 
+	fmt.Println(base64.RawURLEncoding.EncodeToString([]byte("https://github.com/VirusTotal/vt-go/issues/24")))
 	// check that api is capable of scanning the url list
 	if remaining == 0 {
 		fmt.Println("Daily quota exceeded")
 		os.Exit(0)
-	} else if remaining < len(links) {
+		// a scan and report requires 2 api calls
+	} else if remaining*2 < len(links) {
 		fmt.Println("Links found exceeds daily quota")
 		os.Exit(0)
 	}
 
-	// u-0908bb191bccd4d75bc210482c32633530d0e7dd3a3af3c8f1947b1a43eac817-1662056602
-	//report, err := scanner.Scan("https://github.com/VirusTotal/vt-go/issues/24")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//fmt.Println(report)
+	// scan urls
+	for _, link := range links {
+		apiCalls.ScanUrl(*apikey, link)
+	}
+
+	// get reports
+	for _, link := range links {
+		report := apiCalls.GetReport(*apikey, link)
+		if report[1] > 0 {
+			fmt.Println("Link:", link, "is malicious")
+		} else if report[2] > 0 {
+			fmt.Println("Link:", link, "is suspicious")
+		} else {
+			fmt.Println("Link:", link, "is harmless")
+		}
+	}
 }

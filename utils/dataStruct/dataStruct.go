@@ -37,3 +37,38 @@ type Quota struct {
 		} `json:"api_requests_monthly"`
 	} `json:"data"`
 }
+
+type AnalysisReport struct {
+	Data struct {
+		Attributes struct {
+			LastHTTPResponseContentSha256 string        `json:"last_http_response_content_sha256"`
+			LastFinalURL                  string        `json:"last_final_url"`
+			LastHTTPResponseContentLength int           `json:"last_http_response_content_length"`
+			URL                           string        `json:"url"`
+			LastAnalysisDate              int           `json:"last_analysis_date"`
+			Tags                          []interface{} `json:"tags"`
+			LastAnalysisStats             struct {
+				Harmless   int `json:"harmless"`
+				Malicious  int `json:"malicious"`
+				Suspicious int `json:"suspicious"`
+				Undetected int `json:"undetected"`
+				Timeout    int `json:"timeout"`
+			} `json:"last_analysis_stats"`
+			Reputation           int      `json:"reputation"`
+			LastModificationDate int      `json:"last_modification_date"`
+			Title                string   `json:"title"`
+			OutgoingLinks        []string `json:"outgoing_links"`
+			TimesSubmitted       int      `json:"times_submitted"`
+			FirstSubmissionDate  int      `json:"first_submission_date"`
+			TotalVotes           struct {
+				Harmless  int `json:"harmless"`
+				Malicious int `json:"malicious"`
+			} `json:"total_votes"`
+		} `json:"attributes"`
+		Type  string `json:"type"`
+		ID    string `json:"id"`
+		Links struct {
+			Self string `json:"self"`
+		} `json:"links"`
+	} `json:"data"`
+}
