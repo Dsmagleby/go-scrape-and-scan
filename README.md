@@ -1,4 +1,4 @@
-# Go Web scraper and malicious url checker using VirusTotal rest API
+# Go Web scraper and malicious url checker
 
 * On Linux or Mac:
 
